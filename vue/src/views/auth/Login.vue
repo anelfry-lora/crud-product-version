@@ -81,7 +81,7 @@ const login = (ev) => {
 
             <div>
                 <InputLabel for="password" value="Password" />
-                <Input id="password" name="password" type="password" autofocus autocomplete="current-password"
+                <Input id="password" name="password" type="password" autocomplete="current-password"
                     v-model="user.password" />
             </div>
             <div>
