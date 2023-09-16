@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
-class RegisteredUserController extends Controller
+class RegisterUserController extends Controller
 {
     public function store(Request $request)
     {
