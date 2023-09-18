@@ -7,14 +7,23 @@ const props = defineProps({
 });
 
 const deleteProduct = (product) => {
-    let msj = `Are you sure you want to delete this product?`;
-    if (confirm(msj)) {
-        store.dispatch('deleteProduct', product.id)
+    store.commit('openConfirmDeleteModal', product);
+}
+
+const confirmDelete = () => {
+    if (store.state.confirmDeleteModal.productToDelete) {
+        store.dispatch('deleteProduct', store.state.confirmDeleteModal.productToDelete.id)
             .then(() => {
                 store.dispatch('getProducts');
+                store.commit('closeConfirmDeleteModal');
             });
     }
 }
+
+const cancelDelete = () => {
+    store.commit('closeConfirmDeleteModal');
+}
+
 </script>
 
 <template>
@@ -88,6 +97,15 @@ const deleteProduct = (product) => {
                     </tr>
                 </tbody>
             </table>
+        </div>
+        <div v-if="store.state.confirmDeleteModal.isOpen" class="fixed inset-0 z-50 flex items-center justify-center">
+            <div class="p-4 bg-white rounded-lg shadow-lg">
+                <p class="text-lg font-semibold">Are you sure you want to delete this product?</p>
+                <div class="flex justify-end mt-4">
+                    <button @click="cancelDelete" class="mr-4 text-gray-500">Cancel</button>
+                    <button @click="confirmDelete" class="font-semibold text-red-600">Delete</button>
+                </div>
+            </div>
         </div>
     </section>
 </template>
