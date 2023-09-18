@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('name');
             $table->text('description');
             $table->decimal('price', 8, 2);
-            $table->foreignIdFor(Category::class, 'survey_id');
+            $table->foreignIdFor(Category::class, 'category_id');
             $table->foreignIdFor(User::class, 'user_id');
             $table->timestamps();
         });

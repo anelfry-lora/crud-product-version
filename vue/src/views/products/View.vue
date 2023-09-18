@@ -1,13 +1,15 @@
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import store from '../../store';
 import { useRoute, useRouter } from 'vue-router';
 import Page from '../layouts/page.vue';
+import { LockClosedIcon } from "@heroicons/vue/20/solid";
 import Input from '../../components/Input.vue';
 import InputLabel from '../../components/InputLabel.vue';
 import TextAre from '../../components/TextArea.vue';
 import PrimaryButton from '../../components/PrimaryButton.vue';
 import Loading from '../../components/Loading.vue';
+import Alert from '../../components/Alert.vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -22,19 +24,15 @@ let model = ref({
 })
 
 let categories = ref([]);
+let errors = ref("");
+const loading = ref(false);
 
-const fakeCategories = [
-    { id: 1, name: 'Electronics' },
-    { id: 2, name: 'Clothing' },
-    { id: 3, name: 'Home' },
-    { id: 4, name: 'Toys' },
-    { id: 5, name: 'Sports' },
-    { id: 6, name: 'Books' },
-    { id: 7, name: 'Garden' },
-    { id: 8, name: 'Appliances' },
-    { id: 9, name: 'Beauty' },
-    { id: 10, name: 'Music' },
-];
+onMounted(() => {
+    store.dispatch('getCategories')
+        .then(() => {
+            categories.value = store.state.categories;
+        });
+});
 
 watch(
     () => store.state.currentProduct.data,
@@ -46,36 +44,24 @@ watch(
     }
 );
 
-categories.value = fakeCategories;
-
 if (route.params.id) {
     store.dispatch('getProduct', route.params.id);
 }
 
 const saveProduct = () => {
-    store.dispatch('saveProduct', model.value).then(({ data }) => {
-        router.push({
-            name: 'Products',
-            params: { id: data.data.id },
-        })
-    });
+    loading.value = true;
+    store.dispatch('saveProduct', model.value)
+        .then(({ data }) => {
+            loading.value = false;
+            router.push({
+                name: 'Products',
+                params: { id: data.data.id },
+            })
+        }).catch((err) => {
+            loading.value = false;
+            errors.value = err.response.data.error || err.response.data.errors;
+        });;
 }
-
-// let categories = ref([]);
-
-// onMounted(async () => {
-//     categories.value = await fetchCategoriesFromDatabase();
-// });
-
-// async function fetchCategoriesFromDatabase() {
-//     try {
-//         const response = await axios.get('/api/categories');
-//         return response.data;
-//     } catch (error) {
-//         console.error('Error getting categories:', error);
-//         return [];
-//     }
-// }
 
 </script>
 
@@ -85,6 +71,25 @@ const saveProduct = () => {
         <section v-else>
             <form @submit.prevent="saveProduct" class="sm:px-6 lg:px-8 max-w-4xl mx-auto">
                 <div class="sm:rounded-md sm:overflow-hidden shadow">
+                    <Alert v-if="Object.keys(errors).length" class="m-4">
+                        <div v-if="(!!errors) && (errors.constructor === Object)">
+                            <ul v-for="(field, i) of Object.keys(errors)" :key="i" lass="list-inside">
+                                <li v-for="(error, ind) of errors[field] || []" :key="ind">
+                                    * {{ error }}
+                                </li>
+                            </ul>
+                        </div>
+                        <div v-else>
+                            {{ errors }}
+                        </div>
+                        <span @click="errors = ''"
+                            class="w-8 h-8 flex items-center justify-center rounded-full transition-color cursor-pointer hover:bg-[rgba(0,0,0,0.2)]">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </span>
+                    </Alert>
                     <div class="md:grid-cols-2 md:gap-6 grid p-4">
                         <div>
                             <InputLabel for="name" value="Name" />
@@ -131,13 +136,18 @@ const saveProduct = () => {
                             class="hover:bg-red-600 font-semibold bg-red-700 rounded-md px-3 py-1.5 text-sm  leading-6 text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
                             Cancel
                         </router-link>
-                        <PrimaryButton class="ml-4">
+                        <PrimaryButton class="group relative flex ml-4" :disabled="loading" 
+                            :class="{ 'cursor-not-allowed': loading, 'hover:bg-gray-500': loading, }">
+                            <svg v-if="loading" class="animate-spin w-5 h-5 mr-3 -ml-1 text-white"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                                </circle>
+                                <path class="opacity-75" fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                </path>
+                            </svg>
                             <p>{{ model.id ? 'Update' : 'Create' }}</p>
                         </PrimaryButton>
-                        <!-- <Link :href="route('projects.index')"
-                            class="hover:text-red-700 px-4 py-2 font-semibold text-red-600 uppercase rounded-sm">
-                            Cancel
-                        </Link> -->
                     </div>
                 </div>
             </form>
