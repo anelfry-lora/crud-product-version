@@ -84,10 +84,12 @@ const store = createStore({
 
             return response;
         },
-        getProducts({ commit }) {
+        getProducts({ commit }, {url = null} = {}) {
+            url = url || '/product'
+
             commit('setProductsLoading', true);
             return axiosClient
-                .get(`/product`)
+                .get(url)
                 .then((res) => {
                     commit("setProducts", res.data);
                     commit("setProductsLoading", false);
@@ -136,6 +138,7 @@ const store = createStore({
             state.currentProduct.data = product.data;
         },
         setProducts: (state, products) => {
+            state.products.links = products.meta.links;
             state.products.data = products.data;
         },
         setCategories(state, categories) {

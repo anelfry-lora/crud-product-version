@@ -17,7 +17,7 @@ class ProductController extends Controller
     {
         $user = $request->user();
 
-        return ProductResource::collection(Product::where('user_id', $user->id)->paginate(20));
+        return ProductResource::collection(Product::where('user_id', $user->id)->paginate(10));
     }
 
     /**

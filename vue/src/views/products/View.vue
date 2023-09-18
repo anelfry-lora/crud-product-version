@@ -60,7 +60,7 @@ const saveProduct = () => {
         }).catch((err) => {
             loading.value = false;
             errors.value = err.response.data.error || err.response.data.errors;
-        });;
+        });
 }
 
 </script>
@@ -131,7 +131,6 @@ const saveProduct = () => {
                         </div>
                     </div>
                     <div class="flex items-center justify-end m-4">
-                        <!-- :class="{ 'opacity-25': form.processing }" :disabled="form.processing" -->
                         <router-link to="/"
                             class="hover:bg-red-600 font-semibold bg-red-700 rounded-md px-3 py-1.5 text-sm  leading-6 text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
                             Cancel

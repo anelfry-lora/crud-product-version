@@ -14,10 +14,13 @@ store.dispatch('getProducts');
 <template>
     <Page title="List Products"> 
         <Loading  v-if="products.loading"/>
-        <section v-else>
-			<ProductsList :products="products.data"/>
+        <section v-else-if="products.data.length">
+			<ProductsList :products="products.data" />
             <Pagination :value="products" :dispatch="'getProducts'"/>
 		</section>
+        <div v-else class="py-16 text-center text-gray-600">
+            Your don't have product yet
+        </div>        
     </Page>
 </template>
   
