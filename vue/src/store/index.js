@@ -16,7 +16,17 @@ const store = createStore({
         currentProduct: {
             loading: false,
             data: {},
-        }
+        },
+        categories: [],
+        notification: {
+            show: false,
+            type: null,
+            message: null,
+        },
+        confirmDeleteModal: {
+            isOpen: false,
+            productToDelete: null,
+        },
     },
     getters: {},
     actions: {
@@ -41,19 +51,38 @@ const store = createStore({
                     .put(`/product/${product.id}`, product)
                     .then((res) => {
                         commit("setCurrentProduct", res.data);
+                        commit("notify", {
+                            type: "success",
+                            message: res.data.message,
+                        });
                         return res;
                     });
             } else {
-                response = axiosClient.post(`/product`, product).then((res) => {
-                    commit('setCurrentProduct', res.data);
-                    return res;
-                });
+                response = axiosClient.post(`/product`, product)
+                    .then((res) => {
+                        commit('setCurrentProduct', res.data);
+                        commit("notify", {
+                            type: "success",
+                            message: res.data.message,
+                        });
+                        return res;
+                    });
             }
 
             return response;
         },
-        deleteProduct({ }, id) {
-            return axiosClient.delete(`/product/${id}`);
+        deleteProduct({ commit }, id) {
+            console.log("Deleting product with id:", id);
+
+            let response = axiosClient.delete(`/product/${id}`)
+                .then((res) => {
+                    commit("notify", {
+                        message: 'Successfully deleted product.',
+                    });
+                    return res;
+                });
+
+            return response;
         },
         getProducts({ commit }) {
             commit('setProductsLoading', true);
@@ -68,6 +97,11 @@ const store = createStore({
                     commit('setProductsLoading', false);
                     throw error;
                 });
+        },
+        getCategories({ commit }) {
+            return axiosClient.get("/category").then((response) => {
+              commit("setCategory", response.data);
+            });
         },
         logout({ commit }) {
             return axiosClient.post('/logout')
@@ -114,6 +148,23 @@ const store = createStore({
             state.user.data.name = userData.name
             state.user.data.email = userData.email
             sessionStorage.setItem('TOKEN', userData.token);
+        },
+        notify: (state, { type, message }) => {
+            state.notification.show = true;
+            state.notification.type = type;
+            state.notification.message = message;
+
+            setTimeout(() => {
+                state.notification.show = false;
+            }, 3000);
+        },
+        openConfirmDeleteModal(state, product) {
+            state.confirmDeleteModal.isOpen = true;
+            state.confirmDeleteModal.productToDelete = product;
+        },
+        closeConfirmDeleteModal(state) {
+            state.confirmDeleteModal.isOpen = false;
+            state.confirmDeleteModal.productToDelete = null;
         },
     },
     modules: {}
