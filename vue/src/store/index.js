@@ -100,7 +100,7 @@ const store = createStore({
         },
         getCategories({ commit }) {
             return axiosClient.get("/category").then((response) => {
-              commit("setCategory", response.data);
+              commit("setCategories", response.data);
             });
         },
         logout({ commit }) {
@@ -138,6 +138,9 @@ const store = createStore({
         setProducts: (state, products) => {
             state.products.data = products.data;
         },
+        setCategories(state, categories) {
+            state.categories = categories;
+          },
         logout: (state) => {
             state.user.token = null;
             state.user.data = {}
