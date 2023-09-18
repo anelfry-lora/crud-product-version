@@ -82,7 +82,7 @@ const cancelDelete = () => {
                             {{ product.price }}
                         </td>
                         <td class="whitespace-nowrap px-6 py-4">
-                            {{ product.create_at }}
+                            {{ product.created_at }}
                         </td>
                         <td class="whitespace-nowrap px-6 py-4">
                             <router-link :to="{name: 'ProductView', params:{ id: product.id } }" class="hover:underline mr-2 font-semibold text-blue-600">

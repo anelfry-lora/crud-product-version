@@ -23,7 +23,7 @@ class ProductResource extends JsonResource
             'category_id' => $this->category_id,
             'category' => $this->category->name,
             'user_id' => $this->user_id,
-            'created_at' => (new DateTime($this->created_at))->format('h:i:s a, d/M/Y'),
+            'created_at' => (new DateTime($this->created_at))->format('d/M/Y'),
         ];
     }
 }
