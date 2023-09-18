@@ -20,6 +20,8 @@ return new class extends Migration
             $table->unsignedBigInteger('category_id');
             $table->foreignIdFor(User::class, 'user_id');
             $table->timestamps();
+
+            $table->foreign('category_id')->references('id')->on('categories');
         });
     }
 
