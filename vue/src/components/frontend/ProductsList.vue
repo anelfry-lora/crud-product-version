@@ -38,7 +38,7 @@ const cancelDelete = () => {
                     </svg>
                 </router-link>
             </div>
-            <table class="w-full text-sm text-left text-gray-500">
+            <table class="w-full text-sm text-left text-gray-500" v-if="products.length">
                 <thead class="bg-gray-50 text-xs text-gray-700 uppercase">
                     <tr>
                         <th scope="col" class=" p-4">
@@ -97,6 +97,9 @@ const cancelDelete = () => {
                     </tr>
                 </tbody>
             </table>
+            <div v-else class="py-16 text-center text-gray-600">
+                Your don't have product yet
+            </div>    
         </div>
         <div v-if="store.state.confirmDeleteModal.isOpen" class="fixed inset-0 z-50 flex items-center justify-center">
             <div class="p-4 bg-white rounded-lg shadow-lg">
